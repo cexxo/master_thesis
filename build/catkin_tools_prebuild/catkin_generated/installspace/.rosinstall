@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/cexxo/catkin_ws/src/reinforcement_exo/install/setup.sh

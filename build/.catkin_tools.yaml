@@ -1,0 +1,6 @@
+devel_space: /home/cexxo/catkin_ws/src/reinforcement_exo/devel
+install: false
+install_space: /home/cexxo/catkin_ws/src/reinforcement_exo/install
+profile: default
+source_space: /home/cexxo/catkin_ws/src/reinforcement_exo/src
+workspace: /home/cexxo/catkin_ws/src/reinforcement_exo
