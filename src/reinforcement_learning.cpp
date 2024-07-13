@@ -42,6 +42,34 @@ std::vector<Point2D> ReinforcementExo::get_positions(){
     return this->positions;
 }
 
+float ReinforcementExo::get_alpha(){
+    return this->alpha;
+}
+
+float ReinforcementExo::get_gamma(){
+    return this->gamma;
+}
+
+float ReinforcementExo::get_epsilon(){
+    return this->epsilon;
+}
+
+int ReinforcementExo::get_num_actions(){
+    return this->num_actions;
+}
+
+int ReinforcementExo::get_num_states(){
+    return this->num_states;
+}
+
+std::vector<std::string> ReinforcementExo::get_actions(){
+    return this->actions;
+}
+
+int ReinforcementExo::get_current_state(){
+    return this->current_state;
+}
+
 //SETTERS
 
 bool ReinforcementExo::set_joint_angles(std::vector<float>new_angles){
@@ -83,6 +111,7 @@ bool ReinforcementExo::set_qLearner(
     this->epsilon = epsilon;
     this->num_actions = num_actions;
     this->num_states = num_states;
+    this->current_state = 0;
     for(int i = 0; i < this->num_actions;i++)
         this->actions.push_back(actions[i]);
     std::vector<std::vector<float>> temp(num_states);
@@ -200,4 +229,20 @@ bool ReinforcementExo::learn(std::string action, int state1, float reward, int s
     }
     this->learnQ(state1, action, reward, reward + this->gamma * new_max);
     return true;
+}
+
+void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
+    float epsilon_discount = 0.999;
+    for (int i = 0; i < numEpisodes;i++){
+        std::cout << "Starting episode: " << i << std::endl;
+        float cumulatedReward = 0;
+        bool done = false;
+        if(this->get_epsilon() > 0.05)
+            this->epsilon *= epsilon_discount;
+        int state = this->get_current_state();
+        for (int j = 0; j < numSteps; j++){
+            std::cout << "Start step: " << j << std::endl;
+            std::string action = this->choose_action(state);
+        }
+    }
 }

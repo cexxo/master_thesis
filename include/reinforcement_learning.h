@@ -21,6 +21,7 @@ class ReinforcementExo{
         float gamma;
         int num_actions;
         int num_states;
+        int current_state;
         std::vector<std::string> actions;
         std::vector<std::vector<float>> q_table;
 
@@ -36,6 +37,15 @@ class ReinforcementExo{
         std::vector<Point2D> get_joint_limits();
         std::vector<Point2D> get_positions();
 
+        //get methods of the qLearn part
+        float get_epsilon();
+        float get_alpha();
+        float get_gamma();
+        int get_num_actions();
+        int get_num_states();
+        int get_current_state();
+        std::vector<std::string> get_actions();
+        std::vector<std::vector<float>> get_whole_table();
 
         //set methods
         bool set_joint_angles(std::vector<float>);
@@ -46,11 +56,13 @@ class ReinforcementExo{
         bool set_qLearner(float, float, float, int, std::vector<std::string>, int);
         int get_index_from_action(std::string);
         float get_q(int, std::string);
-        std::vector<std::vector<float>> get_whole_table();
         bool update_qTable(int, std::string, float);
         bool learnQ(int, std::string, float, float);
         std::string choose_action(int);
         bool learn(std::string, int, float, int);
+
+        //Learning Methods
+        void startLearning(int,int);
 };
     
 #endif 
