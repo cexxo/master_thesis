@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <cmath>
 #include "Point2D.h"
 
 ReinforcementExo::ReinforcementExo(float thight_length, float shin_length){
@@ -147,5 +148,56 @@ bool ReinforcementExo::learnQ(int state, std::string action, float reward, float
     }else{
         this->update_qTable(state,action,(old_value + this->alpha * (value - old_value)));
     }
+    return true;
+}
+
+std::string ReinforcementExo::choose_action(int state){
+    std::vector<float> q;
+    int index = -1;
+    for (int i = 0; i < this->actions.size();i++){
+        q.push_back(this->get_q(state,this->actions[i]));
+    }
+    float max = -100000;
+    for (int i = 0; i < q.size();i++){
+        if(q[i] > max){
+            max = q[i];
+        }
+    }
+    float random = rand()/RAND_MAX;
+    if (random < this->epsilon){
+        float min = 10000;
+        for(int i = 0; i < q.size();i++){
+            if (q[i] < min){
+                min = q[i];
+            }       
+        }
+        max = abs(max);
+        min = abs(min);
+        float magnitude;
+        if(max >= min) magnitude = max;
+        else magnitude = min;
+        for (int i = 0; i < this->actions.size();i++){
+            q[i] +=  rand()/RAND_MAX*magnitude - 0.5*magnitude;
+        }
+        max = -10000;
+        for (int i = 0; i < q.size();i++){
+            if(q[i] > max){
+                max = q[i];
+                index = i;
+            }
+        }
+
+    }
+    return this->actions[index];
+}
+
+bool ReinforcementExo::learn(std::string action, int state1, float reward, int state2){
+    float new_max = -10000;
+    for(int i = 0; i < this->actions.size();i++){
+        if(new_max < this->get_q(state2,this->actions[i])){
+            new_max = this->get_q(state2,this->actions[i]);
+        }
+    }
+    this->learnQ(state1, action, reward, reward + this->gamma * new_max);
     return true;
 }

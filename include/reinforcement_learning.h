@@ -49,6 +49,8 @@ class ReinforcementExo{
         std::vector<std::vector<float>> get_whole_table();
         bool update_qTable(int, std::string, float);
         bool learnQ(int, std::string, float, float);
+        std::string choose_action(int);
+        bool learn(std::string, int, float, int);
 };
     
 #endif 
