@@ -24,6 +24,7 @@ class ReinforcementExo{
         int current_state;
         std::vector<std::string> actions;
         std::vector<std::vector<float>> q_table;
+        std::vector<int> rewards;
 
     public:
         ReinforcementExo(float thight_length, float shin_length);
@@ -36,6 +37,10 @@ class ReinforcementExo{
         std::vector<float> get_joint_angles();
         std::vector<Point2D> get_joint_limits();
         std::vector<Point2D> get_positions();
+        
+        //set method of the qlearn part
+        bool set_rewards(std::vector<int>);
+        bool set_rewards(std::string, int);
 
         //get methods of the qLearn part
         float get_epsilon();
@@ -46,6 +51,7 @@ class ReinforcementExo{
         int get_current_state();
         std::vector<std::string> get_actions();
         std::vector<std::vector<float>> get_whole_table();
+        std::vector<int> get_rewards();
 
         //set methods
         bool set_joint_angles(std::vector<float>);

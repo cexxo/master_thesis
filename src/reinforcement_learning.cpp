@@ -70,6 +70,42 @@ int ReinforcementExo::get_current_state(){
     return this->current_state;
 }
 
+std::vector<int> ReinforcementExo::get_rewards(){
+    return this->rewards;
+}
+
+int ReinforcementExo::get_index_from_action(std::string action){
+    bool found = false;
+    int index = 0;
+    for (int i = 0; i < this->actions.size();i++){
+        if(action == this->actions[i]){
+            found = true;
+            index = i;
+        }
+    }
+    if(!found){
+        std::cout << "trying to access unavailable action" << std::endl;
+        return -1;
+    }
+    return index;
+}
+
+float ReinforcementExo::get_q(int state, std::string action){
+    if(state >= this->q_table.size()){
+        std::cout << "trying to access unavailable state" << std::endl;
+        return -1;
+    }
+    int index = this->get_index_from_action(action);
+    if (index != -1)
+        return this->q_table[state][index];
+    else
+        return -1;
+}
+
+std::vector<std::vector<float>> ReinforcementExo::get_whole_table(){
+    return this->q_table;
+}
+
 //SETTERS
 
 bool ReinforcementExo::set_joint_angles(std::vector<float>new_angles){
@@ -124,37 +160,26 @@ bool ReinforcementExo::set_qLearner(
     return true;
 }
 
-int ReinforcementExo::get_index_from_action(std::string action){
-    bool found = false;
-    int index = 0;
-    for (int i = 0; i < this->actions.size();i++){
-        if(action == this->actions[i]){
-            found = true;
-            index = i;
-        }
+bool ReinforcementExo::set_rewards(std::vector<int> new_rewards){
+    if(new_rewards.size() != this->get_actions().size()){
+        std::cout << "the size of the reward value does not match the desired one: " << new_rewards.size() << " != " << this->get_actions().size() << std::endl;
+        return false;
     }
-    if(!found){
-        std::cout << "trying to access unavailable action" << std::endl;
-        return -1;
-    }
-    return index;
+    this->rewards = new_rewards;
+    return true;
 }
 
-float ReinforcementExo::get_q(int state, std::string action){
-    if(state >= this->q_table.size()){
-        std::cout << "trying to access unavailable state" << std::endl;
-        return -1;
+bool ReinforcementExo::set_rewards(std::string action, int new_reward){
+    if(this->get_index_from_action(action) != -1){
+        this->rewards[this->get_index_from_action(action)] = new_reward;
+        return true;
+    }else{
+        std::cout << "no action " << action << " found, impossible set new value" << std::endl;
+        return false;
     }
-    int index = this->get_index_from_action(action);
-    if (index != -1)
-        return this->q_table[state][index];
-    else
-        return -1;
 }
 
-std::vector<std::vector<float>> ReinforcementExo::get_whole_table(){
-    return this->q_table;
-}
+//Reinforcement Learning methods
 
 bool ReinforcementExo::update_qTable(int state, std::string action, float new_value){
     if(state >= this->q_table.size()){
