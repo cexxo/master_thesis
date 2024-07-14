@@ -125,7 +125,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(rl_exo src/main.cpp src/reinforcement_learning.cpp src/Point2D.cpp)
+add_executable(rl_exo src/main.cpp src/reinforcement_learning.cpp src/Point2D.cpp src/ExoSagittalModel.cpp src/GeneralUtilities.cpp src/CubicTrajectoryGenerator2D.cpp)
 add_dependencies(rl_exo ${catkin_EXPORTED_TARGETS} )
 target_link_libraries(rl_exo ${catkin_LIBRARIES} )
 ## Declare a C++ library

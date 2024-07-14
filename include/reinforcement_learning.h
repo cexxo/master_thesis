@@ -4,8 +4,9 @@
 #include <vector>
 #include "Point2D.h"
 #include <string>
+#include "ExoSagittalModel.h"
 
-class ReinforcementExo{
+class ReinforcementExo : public ExoSagittalModel{
 
     private:
         //EXO CONSTANTS

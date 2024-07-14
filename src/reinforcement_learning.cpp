@@ -4,15 +4,16 @@
 #include <string>
 #include <cmath>
 #include "Point2D.h"
+#include "ExoSagittalModel.h"
 
-ReinforcementExo::ReinforcementExo(float thight_length, float shin_length){
+ReinforcementExo::ReinforcementExo(float thight_length, float shin_length) : ExoSagittalModel(0.5, 0.5 , 0.09, 0.11){
     this->thight_length = thight_length;
     this->shin_length = shin_length;
 }
 
 ReinforcementExo::ReinforcementExo(
     float thight_length, float shin_length, std::vector<Point2D> positions
-    ){
+    ) : ExoSagittalModel(0.5, 0.5 , 0.09, 0.11){
     this->thight_length = thight_length;
     this->shin_length = shin_length;
     this->positions = positions;
