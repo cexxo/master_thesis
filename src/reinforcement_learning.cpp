@@ -268,6 +268,11 @@ void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
         for (int j = 0; j < numSteps; j++){
             std::cout << "Start step: " << j << std::endl;
             std::string action = this->choose_action(state);
+            //Execute the action
+            //This action should give me a reward according to where i found myself afterwards
+            //I increment the current cumulated reward
+            //I calculate the next state accoridng to how the robot found itself
+            //I update the state and proceed to the next iteration
         }
     }
 }
