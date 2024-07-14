@@ -257,6 +257,21 @@ bool ReinforcementExo::learn(std::string action, int state1, float reward, int s
     return true;
 }
 
+bool ReinforcementExo::executeAction(std::string action){                   //THIS FUNCTION IS GONNA BE THE FULCRUM OF THE CODE. I HAVE TO THINK IT CORRECTLY
+    if(action == "left_thight"){                                            //STILL A LOT OF WORK TO DO.
+        return true;
+    }else if (action == "left_shin"){
+        return true;
+    }else if (action == "right_thight"){
+        return true;
+    }else if (action == "right_shin"){
+        return true;
+    }else{
+        return true;
+    }
+    return true;
+}
+
 void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
     float epsilon_discount = 0.999;
     for (int i = 0; i < numEpisodes;i++){
@@ -269,6 +284,7 @@ void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
         for (int j = 0; j < numSteps; j++){
             std::cout << "Start step: " << j << std::endl;
             std::string action = this->choose_action(state);
+            this->executeAction(action);
             //Execute the action
             //This action should give me a reward according to where i found myself afterwards
             //I increment the current cumulated reward
