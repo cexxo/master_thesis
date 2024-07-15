@@ -155,7 +155,7 @@ bool ReinforcementExo::set_qLearner(
     this->q_table = temp;
     for(int i = 0; i < q_table.size();i++){
         for(int j = 0; j < num_actions; j++){
-            q_table[i].push_back(0);
+            q_table[i].push_back(-2 + (random()/RAND_MAX)*2);
         }
     }
     return true;
@@ -257,19 +257,42 @@ bool ReinforcementExo::learn(std::string action, int state1, float reward, int s
     return true;
 }
 
-bool ReinforcementExo::executeAction(std::string action){                   //THIS FUNCTION IS GONNA BE THE FULCRUM OF THE CODE. I HAVE TO THINK IT CORRECTLY
-    if(action == "left_thight"){                                            //STILL A LOT OF WORK TO DO.
-        return true;
-    }else if (action == "left_shin"){
-        return true;
-    }else if (action == "right_thight"){
-        return true;
-    }else if (action == "right_shin"){
-        return true;
-    }else{
-        return true;
+
+//0 = up    1 = up-right    2 = right   3 = right-bottom    4 = bottom  5 = bottom-left     6 = left    7= top-left 
+float ReinforcementExo::executeAction(int state, std::string action){      //THIS FUNCTION IS GONNA BE THE FULCRUM OF THE CODE. I HAVE TO THINK IT CORRECTLY
+    int index = get_index_from_action(action);
+    switch (index)
+    {
+    case 0:
+        return this->q_table[state][index+1];
+        break;
+    case 1:
+        return this->q_table[state+1][index+1];
+        break;
+    case 2:
+        return this->q_table[state+1][index];
+        break;
+    case 3:
+        return this->q_table[state+1][index-1];
+        break;
+    case 4:
+        return this->q_table[state][index-1];
+        break;
+    case 5:
+        return this->q_table[state-1][index-1];
+        break;
+    case 6:
+        return this->q_table[state-1][index];
+        break;
+    case 7:
+        return this->q_table[state-1][index+1];
+        break;
+    default:
+        std::cout << "EXECUTE ACTION: something went wrong, impossible to choose action " << std::endl;
+        return -1;
+        break;
     }
-    return true;
+    return -1;
 }
 
 void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
@@ -284,7 +307,7 @@ void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
         for (int j = 0; j < numSteps; j++){
             std::cout << "Start step: " << j << std::endl;
             std::string action = this->choose_action(state);
-            this->executeAction(action);
+            this->executeAction(state,action);
             //Execute the action
             //This action should give me a reward according to where i found myself afterwards
             //I increment the current cumulated reward

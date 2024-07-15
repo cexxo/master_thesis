@@ -67,7 +67,7 @@ class ReinforcementExo : public ExoSagittalModel{
         bool learnQ(int, std::string, float, float);
         std::string choose_action(int);
         bool learn(std::string, int, float, int);
-        bool executeAction(std::string);
+        float executeAction(int,std::string);
 
         //Learning Methods
         void startLearning(int,int);

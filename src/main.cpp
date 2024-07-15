@@ -11,7 +11,7 @@ int main(){
     std::vector<Point2D> temp = exo.get_positions();
     /*for(int i=0;i<temp.size();i++)
         std::cout << temp[i].get()[0] << " " << temp[i].get()[1] << std::endl;*/
-    std::vector<std::string> actions = {"left_thight","left_shin","right_thight","right_shin","align_feet"};
+    std::vector<std::string> actions = {"up", "up-right", "right", "right_bottom", "bottom" , "bottom_left", "left", "top_left"};
     std::cout << exo.set_qLearner(0.1,0.7,0.9,actions.size(),actions,5) << std::endl;  //In the simplest case i have 5 states: before, on top and after the obstacle.
     std::cout << exo.get_whole_table().size() << std::endl;
     std::cout << exo.get_whole_table()[0].size() << std::endl;
