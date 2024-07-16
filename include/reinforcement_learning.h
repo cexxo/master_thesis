@@ -22,7 +22,7 @@ class ReinforcementExo : public ExoSagittalModel{
         float gamma;
         int num_actions;
         int num_states;
-        std::vector<int> current_state = {0,0};
+        std::vector<int> current_state = {1,1};
         std::vector<std::string> actions;
         std::vector<std::vector<std::vector<float>>> q_table;   //3D table, since the state is a x-y representation and the third dimension for each action
         std::vector<int> rewards;
@@ -52,7 +52,7 @@ class ReinforcementExo : public ExoSagittalModel{
         std::vector<int> get_current_state();
         std::vector<std::string> get_actions();
         std::vector<std::vector<std::vector<float>>> get_whole_table();
-        std::vector<int> get_rewards();
+        float get_rewards(int, int, int);
 
         //set methods
         bool set_joint_angles(std::vector<float>);
@@ -67,10 +67,10 @@ class ReinforcementExo : public ExoSagittalModel{
         bool learnQ(int, int, int, float, float);
         int choose_action(int, int);
         bool learn(int, int, int, float, int, int);
-        float executeAction(int,std::string);
+        float executeAction(int, int, int, std::vector<int>&);
 
         //Learning Methods
-        void startLearning(int,int);
+        void startLearning(int, int, bool);
 };
     
 #endif 

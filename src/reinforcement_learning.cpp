@@ -71,20 +71,23 @@ std::vector<int> ReinforcementExo::get_current_state(){
     return this->current_state;
 }
 
-std::vector<int> ReinforcementExo::get_rewards(){
-    return this->rewards;
+float ReinforcementExo::get_rewards(int x, int y, int action){
+    return this->q_table[x][y][action];
 }
 
 
 float ReinforcementExo::get_q(int x, int y, int action){
     if(x >= this->q_table.size() || x < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "trying to access x: " << x << std::endl;
+        std::cout << "get_q: x_axis error: accessing invalid state" << std::endl  << std::endl;
         return -1;
     }else if(y >= this->q_table[0].size() || y < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "trying to access y: " << y << std::endl;
+        std::cout << "get_q: y_axis error: accessing invalid state" << std::endl  << std::endl;
         return -1;
     }else if(action >= this->q_table[0][0].size() || action < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "trying to access k: " << action << std::endl;
+        std::cout << "get_q: k_axis error: accessing invalid state" << std::endl  << std::endl;
         return -1;
     }
     return this->q_table[x][y][action];
@@ -135,10 +138,14 @@ bool ReinforcementExo::set_qLearner(float alpha, float gamma, float epsilon, int
         for(int i = 0; i < this->get_whole_table().size();i++){
             for (int j = 0; j < this->get_whole_table()[0].size();j++){
                 //std::cout << (float) rand()/RAND_MAX << std::endl;
-                this->q_table[i][j][k] = ((float) rand()/RAND_MAX)*-1;
+                //this->q_table[i][j][k] = ((float) rand()/RAND_MAX)*-1;
+                this->q_table[i][j][k] = (rand() % 2)*-1;
             }
         }
     }
+    this->q_table[9][9][0] = 2;
+    this->q_table[9][10][0] = 2;
+    this->q_table[19][19][0] = 10;
     return true;
 }
 
@@ -153,10 +160,10 @@ bool ReinforcementExo::set_rewards(std::vector<int> new_rewards){
 
 bool ReinforcementExo::set_current_state(int x, int y){
     if(x >= this->q_table.size() || x < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "set_current_state: x_axis error: accessing invalid state" << std::endl;
         return false;
     }else if(y >= this->q_table[0].size() || y < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "set_current_state: y_axis error: accessing invalid state" << std::endl;
         return false;
     }else{
         this->current_state[0]= x;
@@ -179,17 +186,20 @@ bool ReinforcementExo::set_current_state(int x, int y){
 
 bool ReinforcementExo::update_qTable(int x, int y, int action, float new_value){
     if(x >= this->q_table.size() || x < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "trying to access x: " << x << std::endl;
+        std::cout << "update table: x_axis error: accessing invalid state" << std::endl << std::endl;
         return false;
     }else if(y >= this->q_table[0].size() || y < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "trying to access y: " << y << std::endl;
+        std::cout << "update table: y_axis error: accessing invalid state" << std::endl << std::endl;
         return false;
     }else if(action >= this->q_table[0][0].size() || action < 0){
-        std::cout << "x_axis error: accessing invalid state" << std::endl;
+        std::cout << "trying to access k: " << action << std::endl;
+        std::cout << "update table: k_axis error: accessing invalid state" << std::endl << std::endl;
         return false;
     }
     else{
-        this->q_table[x][y][action] = new_value;
+        this->q_table[x][y][0] = new_value;
         return true;
     }
 }
@@ -207,15 +217,23 @@ bool ReinforcementExo::learnQ(int x, int y, int action, float reward, float valu
 
 int ReinforcementExo::choose_action(int x, int y){
     std::vector<float> q;
+    std::vector<std::vector<int>> xy;
     int index = -1;
+    std::vector<float> max_q;
+    std::vector<int> dummy;
     for (int i = 0; i < this->num_actions;i++){
-        q.push_back(this->get_q(x, y, i));
+        q.push_back(this->executeAction(x,y,i,dummy));
+        xy.push_back({x, y});
     }
     float max = -100000;
     for (int i = 0; i < q.size();i++){
         if(q[i] > max){
             max = q[i];
         }
+    }
+    for(int i = 0; i < q.size();i++){
+        if(q[i] == max)
+            max_q.push_back(i);
     }
     float random = rand()/RAND_MAX;
     if (random < this->epsilon){
@@ -234,22 +252,28 @@ int ReinforcementExo::choose_action(int x, int y){
             q[i] +=  rand()/RAND_MAX*magnitude - 0.5*magnitude;
         }
         max = -10000;
-        for (int i = 0; i < q.size();i++){
-            if(q[i] > max){
-                max = q[i];
-                index = i;
+        if(max_q.size() == 1){
+            for (int i = 0; i < q.size();i++){
+                if(q[i] > max){
+                    max = q[i];
+                    index = i;
+                }
             }
+            std::cout << "action choice " << index << std::endl;
+        }else{
+            index = (rand()%max_q.size())-1;
+            std::cout << "action choice " << index << std::endl;;
         }
 
     }
     return index;
 }
 
-bool ReinforcementExo::learn(int action, int x1, int y1, float reward, int x2, int y2){
+bool ReinforcementExo::learn( int x1, int y1, int action, float reward, int x2, int y2){
     float new_max = -10000;
     for(int i = 0; i < this->num_actions;i++){
-        if(new_max < this->get_q(x2, y2, i)){
-            new_max = this->get_q(x2, y2, i);
+        if(new_max < this->get_q(x2, y2, 0)){
+            new_max = this->get_q(x2, y2, 0);
         }
     }
     this->learnQ(x1, y1, action, reward, reward + this->gamma * new_max);
@@ -258,33 +282,40 @@ bool ReinforcementExo::learn(int action, int x1, int y1, float reward, int x2, i
 
 
 //0 = up    1 = up-right    2 = right   3 = right-bottom    4 = bottom  5 = bottom-left     6 = left    7= top-left 
-/*float ReinforcementExo::executeAction(int state, std::string action){      //THIS FUNCTION IS GONNA BE THE FULCRUM OF THE CODE. I HAVE TO THINK IT CORRECTLY
-    int index = get_index_from_action(action);
-    switch (index)
+float ReinforcementExo::executeAction(int x, int y, int action, std::vector<int>& new_state){      //THIS FUNCTION IS GONNA BE THE FULCRUM OF THE CODE. I HAVE TO THINK IT CORRECTLY
+    switch (action)
     {
     case 0:
-        return this->q_table[state][index+1];
+        new_state = {x,y+1};
+        return this->q_table[x][y+1][0];
         break;
     case 1:
-        return this->q_table[state+1][index+1];
+        new_state = {x+1,y+1};
+        return this->q_table[x+1][y+1][0];
         break;
     case 2:
-        return this->q_table[state+1][index];
+        new_state = {x+1,y};
+        return this->q_table[x+1][y][0];
         break;
     case 3:
-        return this->q_table[state+1][index-1];
+        new_state = {x+1,y-1};
+        return this->q_table[x+1][y-1][0];
         break;
     case 4:
-        return this->q_table[state][index-1];
+        new_state = {x,y-1};
+        return this->q_table[x][y-1][0];
         break;
     case 5:
-        return this->q_table[state-1][index-1];
+        new_state = {x-1,y-1};
+        return this->q_table[x-1][y-1][0];
         break;
     case 6:
-        return this->q_table[state-1][index];
+        new_state = {x-1,y};
+        return this->q_table[x-1][y][0];
         break;
     case 7:
-        return this->q_table[state-1][index+1];
+        new_state = {x-1,y+1};
+        return this->q_table[x-1][y+1][0];
         break;
     default:
         std::cout << "EXECUTE ACTION: something went wrong, impossible to choose action " << std::endl;
@@ -292,10 +323,11 @@ bool ReinforcementExo::learn(int action, int x1, int y1, float reward, int x2, i
         break;
     }
     return -1;
-}*/
+}
 
-void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
+void ReinforcementExo::startLearning(int numEpisodes, int numSteps, bool display){
     float epsilon_discount = 0.999;
+    float highestReward = 0;
     for (int i = 0; i < numEpisodes;i++){
         std::cout << "Starting episode: " << i << std::endl;
         float cumulatedReward = 0;
@@ -303,15 +335,50 @@ void ReinforcementExo::startLearning(int numEpisodes, int numSteps){
         if(this->get_epsilon() > 0.05)
             this->epsilon *= epsilon_discount;
         std::vector<int> state = this->get_current_state();
+        std::vector<int> new_state = {-1,-1};
         for (int j = 0; j < numSteps; j++){
-            std::cout << "Start step: " << j << std::endl;
-            //std::string action = this->choose_action(state);
-            //this->executeAction(state,action);
+            //std::cout << "Start step: " << j << std::endl;
+            int action = this->choose_action(state[0], state[1]);
+            //int action = 0;
+            cumulatedReward += this->executeAction(state[0],state[1],action,new_state);
+            std::cout << state[0] << " " << state[1] << std::endl;
+            std::cout << new_state[0] << " " << new_state[1] << std::endl << std::endl << std::endl << std::endl;
+            std::cout << action << std::endl << std::endl << std::endl << std::endl;
+            if (highestReward < cumulatedReward)
+                highestReward = cumulatedReward;
+            int reward = 0;
+            if(new_state[0] > state[0]){
+                if(new_state[1] >= state[1]){
+                    reward = 1;
+                }else{
+                    reward = 0;
+                }
+            }else if(new_state[0] == 19 && new_state[1] == 19){
+                reward = 10;
+            }else{
+                reward = -1;
+            }
+            this->learn(state[0],state[1], action, 100, new_state[0], new_state[1]);
+            state = new_state;
             //Execute the action
             //This action should give me a reward according to where i found myself afterwards
             //I increment the current cumulated reward
             //I calculate the next state accoridng to how the robot found itself
             //I update the state and proceed to the next iteration
+        }
+        if(display){
+            for(int k = 0; k < this->get_whole_table()[0][0].size();k++){
+                    std::cout << "table " << k << std::endl;
+                    for(int i = 0; i < this->get_whole_table().size();i++){
+                        for (int j = 0; j < this->get_whole_table()[0].size();j++){
+                            std::cout << this->get_whole_table()[i][j][k] << " ";
+                        }
+                        std::cout << std::endl;
+                    }
+                    std::cout << std::endl;
+                    std::cout << std::endl;
+                    std::cout << std::endl;
+            }
         }
     }
 }
