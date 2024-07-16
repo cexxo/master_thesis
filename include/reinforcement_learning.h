@@ -22,9 +22,9 @@ class ReinforcementExo : public ExoSagittalModel{
         float gamma;
         int num_actions;
         int num_states;
-        int current_state;
+        std::vector<int> current_state = {0,0};
         std::vector<std::string> actions;
-        std::vector<std::vector<float>> q_table;
+        std::vector<std::vector<std::vector<float>>> q_table;   //3D table, since the state is a x-y representation and the third dimension for each action
         std::vector<int> rewards;
 
     public:
@@ -49,9 +49,9 @@ class ReinforcementExo : public ExoSagittalModel{
         float get_gamma();
         int get_num_actions();
         int get_num_states();
-        int get_current_state();
+        std::vector<int> get_current_state();
         std::vector<std::string> get_actions();
-        std::vector<std::vector<float>> get_whole_table();
+        std::vector<std::vector<std::vector<float>>> get_whole_table();
         std::vector<int> get_rewards();
 
         //set methods
@@ -60,13 +60,13 @@ class ReinforcementExo : public ExoSagittalModel{
         bool set_positions(std::vector<Point2D>);
 
         //Reinforcement learning methods
-        bool set_qLearner(float, float, float, int, std::vector<std::string>, int);
-        int get_index_from_action(std::string);
-        float get_q(int, std::string);
-        bool update_qTable(int, std::string, float);
-        bool learnQ(int, std::string, float, float);
-        std::string choose_action(int);
-        bool learn(std::string, int, float, int);
+        bool set_current_state(int x, int y);
+        bool set_qLearner(float, float, float, int, int, int);
+        float get_q(int, int, int);
+        bool update_qTable(int, int, int, float);
+        bool learnQ(int, int, int, float, float);
+        int choose_action(int, int);
+        bool learn(int, int, int, float, int, int);
         float executeAction(int,std::string);
 
         //Learning Methods
