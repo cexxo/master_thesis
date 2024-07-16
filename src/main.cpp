@@ -33,7 +33,7 @@ int main(){
         std::cout << std::endl;
         std::cout << std::endl;
     }
-    exo.startLearning(5,3,false);
+    exo.startLearning(200,50,false);
     std::cout << "AFTER LEARNING" << std::endl;
     for(int k = 1; k < 2/*exo.get_whole_table()[0][0].size()*/;k++){
         std::cout << "table " << k << std::endl;
@@ -45,6 +45,13 @@ int main(){
         }
         std::cout << std::endl;
         std::cout << std::endl;
+        std::cout << std::endl;
+    }
+    for(int i = exo.get_executed_actions().size()-10; i < exo.get_executed_actions().size(); i++){
+        std::cout << exo.get_executed_actions().size() << std::endl;
+        for(int j = 0; j < exo.get_executed_actions()[i].size();j++){
+            std::cout << exo.get_executed_actions()[i][j] << " ";
+        }
         std::cout << std::endl;
     }
     //MISSING TO SEE IF LEARNQ WORKS
