@@ -9,12 +9,12 @@ import time
 
 style.use("ggplot")
 
-ENV_SIZE = 15
-NUM_EPISODES = 1000
-NUM_STEPS = 50
-MOVE_PENALTY = 1
+ENV_SIZE = 10
+NUM_EPISODES = 25000
+NUM_STEPS = 200
+MOVE_PENALTY = 4
 OBSTACLE_PENALTY = 300
-GOAL_REWARD = 100
+GOAL_REWARD = 25
 epsilon = 0.9
 EPS_DECAY = 0.9998 #0.9998
 SHOW_EVERY = 40
@@ -47,10 +47,7 @@ class Blob:
         return (self.x-other.x, self.y-other.y)
     
     def action(self, choice):
-        #if choice == 0:
-            #self.move(x=0, y=-1)
-        #elif choice == 1:
-            #self.move(x=+1, y=-1)
+        #
         if choice == 0:
             self.move(x=-1, y=0)
         elif choice == 1:
@@ -61,22 +58,26 @@ class Blob:
             self.move(x=-1, y=1)
         elif choice == 4:
             self.move(x=1, y=0)
-        #elif choice == 7:
-            #self.move(x=-1, y=-1)
+        elif choice == 5:
+            self.move(x=+1, y=-1)
+        elif choice == 6:
+            self.move(x=0, y=-1)
+        elif choice == 7:
+            self.move(x=-1, y=-1)
 
     def move(self, x=False, y=False):
-
+        r = 1
         # If no value for x, move randomly
         if not x:
-            self.x += np.random.randint(-1, 2)
+            self.x += np.random.randint(-1, 2)*r
         else:
-            self.x += x
+            self.x += x*r
 
         # If no value for y, move randomly
         if not y:
-            self.y += np.random.randint(-1, 2)
+            self.y += np.random.randint(-1, 2)*r
         else:
-            self.y += y
+            self.y += y*r
 
         # If we are out of bounds, fix!
         if self.x < 0:
@@ -102,6 +103,7 @@ else:
 print("q_table ready")
 episode_rewards = []
 count = 0
+executed_actions = []
 for episode in range(NUM_EPISODES):
     print(f"episode: {episode}")
     player = Blob()
@@ -113,6 +115,15 @@ for episode in range(NUM_EPISODES):
     obstacle = Blob()
     obstacle.y = int(ENV_SIZE/2)
     obstacle.x = ENV_SIZE - 1
+    obstacle2 = Blob()
+    obstacle2.y = int(ENV_SIZE/2)+1
+    obstacle2.x = ENV_SIZE - 1
+    obstacle3 = Blob()
+    obstacle3.y = int(ENV_SIZE/2)-1
+    obstacle3.x = ENV_SIZE - 1
+    obstacle4 = Blob()
+    obstacle4.y = int(ENV_SIZE/2)
+    obstacle4.x = ENV_SIZE - 2
     mid_point = Blob()
     mid_point.y = int(ENV_SIZE/2)
     mid_point.x = ENV_SIZE - 3
@@ -123,7 +134,10 @@ for episode in range(NUM_EPISODES):
     else:
         show = False
     episode_reward = 0
+    temp_actions = []
+    temp_trajectory = []
     for i in range(NUM_STEPS):
+        start_point = (player.y, player.x)
         obs = (player-goal, player-obstacle)
         #print(obs)
         if np.random.random() > epsilon:
@@ -134,7 +148,14 @@ for episode in range(NUM_EPISODES):
         # Take the action!
         #distance_pre_movement = (((goal.x - player.x)**2 + (goal.y - player.y)**2)**(0.5))
         player.action(action)
+        temp_actions.append(action)
         if player.x == obstacle.x and player.y == obstacle.y:
+            reward = -OBSTACLE_PENALTY
+        elif player.x == obstacle2.x and player.y == obstacle2.y:
+            reward = -OBSTACLE_PENALTY
+        elif player.x == obstacle3.x and player.y == obstacle3.y:
+            reward = -OBSTACLE_PENALTY
+        elif player.x == obstacle4.x and player.y == obstacle4.y:
             reward = -OBSTACLE_PENALTY
         elif player.x == goal.x and player.y == goal.y:
             reward = GOAL_REWARD
@@ -147,7 +168,7 @@ for episode in range(NUM_EPISODES):
         current_q = q_table[obs][action]
 
         if reward == GOAL_REWARD:
-            new_q = GOAL_REWARD-i
+            new_q = GOAL_REWARD
         else:
             new_q = (1 - LEARNING_RATE) * current_q + LEARNING_RATE * (reward + DISCOUNT * max_future_q)
 
@@ -155,12 +176,24 @@ for episode in range(NUM_EPISODES):
             env = np.zeros((ENV_SIZE, ENV_SIZE, 3), dtype=np.uint8)     # starts an rbg of our size
             env[goal.x][goal.y] = d[GOAL_N]                             # sets the food location tile to green color
             env[player.x][player.y] = d[JOINT_N]                        # sets the player tile to blue
-            env[obstacle.x][obstacle.y] = d[OBSTACLE_N]                 # sets the enemy location to red
-            env[mid_point.x][mid_point.y] = d[MIDPOINT_N]
+            #cv2.circle(env, (player.y,player.x), 1, d[JOINT_N])
+            env[obstacle.x][obstacle.y] = d[OBSTACLE_N]
+            env[obstacle2.x][obstacle2.y] = d[OBSTACLE_N] 
+            env[obstacle3.x][obstacle3.y] = d[OBSTACLE_N] 
+            env[obstacle4.x][obstacle4.y] = d[OBSTACLE_N]
+            temp_trajectory.append((player.y,player.x))
             img = Image.fromarray(env, 'RGB')                           # reading to rgb. Apparently. Even tho color definitions are bgr. ???
-            img = img.resize((800, 800))                              # resizing so we can see our agent in all its glory.
-            cv2.imshow("image", np.array(img))                          # show it!
-        if reward == GOAL_REWARD: #or reward == -OBSTACLE_PENALTY:        # crummy code to hang at the end if we reach abrupt end for good reasons or not.
+            img = img.resize((600, 600))                                # resizing so we can see our agent in all its glory.          
+            cv2.imshow("image", np.array(img))
+            env2 = np.zeros((ENV_SIZE, ENV_SIZE, 3), dtype=np.uint8)
+            color = 0
+            for j in temp_trajectory:
+                cv2.circle(env2,j, 0, (255-color,255,0))
+                color += 2
+            img2 = Image.fromarray(env2, 'RGB')                           # reading to rgb. Apparently. Even tho color definitions are bgr. ???
+            img2 = img2.resize((400, 400))                                # resizing so we can see our agent in all its glory.          
+            cv2.imshow("image2", np.array(img2))
+        if reward == GOAL_REWARD or reward == -OBSTACLE_PENALTY:        # crummy code to hang at the end if we reach abrupt end for good reasons or not.
             if cv2.waitKey(500) & 0xFF == ord('q'):
                 break
         else:
@@ -170,8 +203,13 @@ for episode in range(NUM_EPISODES):
         if reward == GOAL_REWARD:
             count += 1
             print(f"!!!goal {count} reached!!! in {i} steps!!!")
-        if reward == GOAL_REWARD: #or reward == -OBSTACLE_PENALTY:
+        if reward == GOAL_REWARD or reward == -OBSTACLE_PENALTY:
             break
+    if(episode == 0):
+        executed_actions = temp_actions
+    else:
+        if len(temp_actions) <= len(executed_actions):
+            executed_actions = temp_actions
     episode_rewards.append(episode_reward)
     epsilon *= EPS_DECAY
 
@@ -181,6 +219,8 @@ plt.plot([i for i in range(len(moving_avg))], moving_avg)
 plt.ylabel(f"Reward {SHOW_EVERY}ma")
 plt.xlabel("episode #")
 plt.show()
+
+print(executed_actions)
 
 with open(f"qtable-{int(time.time())}.pickle", "wb") as f:
     pickle.dump(q_table, f)
